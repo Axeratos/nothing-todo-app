@@ -1,1 +1,2 @@
-poetry.lock
+app/db/storage/
+!app/db/storage/.gitkeep
