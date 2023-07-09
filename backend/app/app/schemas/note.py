@@ -16,5 +16,4 @@ class NoteUpdate(NoteBase):
 
 
 class NoteDB(NoteBase, BaseDBSchema):
-    pk: int
     text: str

@@ -21,6 +21,5 @@ class TaskUpdate(TaskBase):
 
 
 class TaskDB(TaskBase, BaseDBSchema):
-    pk: int
     title: str
     deadline_date: date
