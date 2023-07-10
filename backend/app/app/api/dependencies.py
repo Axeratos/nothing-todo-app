@@ -1,6 +1,9 @@
+from fastapi.security import OAuth2PasswordBearer, OAuth2
 from sqlalchemy.ext.asyncio import async_sessionmaker
 
 from app.db.database_core import engine
+
+oauth2 = OAuth2PasswordBearer(tokenUrl="access-token")
 
 
 async def get_session():
