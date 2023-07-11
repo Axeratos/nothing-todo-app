@@ -19,6 +19,11 @@ class UserCreate(UserBase):
         self.password = hash_password(self.password)
 
 
+class UserLogin(UserBase):
+    login: str | EmailStr
+    password: str
+
+
 class UserUpdate(UserBase):
     pass
 
