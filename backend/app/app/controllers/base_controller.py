@@ -15,7 +15,8 @@ class BaseDatabaseController:
         return queryset.first()
 
     async def get_all(self):
-        pass
+        queryset = await self.session.scalars(select(self.model))
+        return queryset.all()
 
     async def get_with_options(self, **kwargs):
         queryset = await self.session.scalars(select(self.model).where(or_(
@@ -36,5 +37,10 @@ class BaseDatabaseController:
     async def update(self, data):
         pass
 
-    async def delete(self, pk: int):
-        pass
+    async def delete(self, **kwargs):
+        object_delete = self.get(**kwargs)
+        if not object_delete:
+            return
+        await self.session.delete(object_delete)
+        await self.session.commit()
+        return object_delete
