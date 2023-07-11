@@ -2,7 +2,7 @@ from typing import Type, Generic, Sequence
 
 from fastapi.encoders import jsonable_encoder
 from pydantic import BaseModel
-from sqlalchemy import select, or_
+from sqlalchemy import select, or_, ScalarResult
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.controllers.types import ModelType, CreateSchemaType, UpdateSchemaType
@@ -21,7 +21,7 @@ class BaseDatabaseController(Generic[ModelType, CreateSchemaType, UpdateSchemaTy
         queryset = await self.session.scalars(select(self.model))
         return queryset.all()
 
-    async def get_options_queryset(self, **kwargs):
+    async def get_options_queryset(self, **kwargs) -> ScalarResult:
         return await self.session.scalars(select(self.model).where(or_(
             getattr(self.model, column) == value for column, value in kwargs.items()
         )))
