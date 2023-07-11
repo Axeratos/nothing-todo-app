@@ -14,5 +14,6 @@ async def sign_up(user_data: UserCreate, db: DBSession):
     old_user = await controller.get_with_options(email=user_data.email, username=user_data.username)
     if old_user:
         raise HTTPException(status_code=400)
-    new_user = controller.create(user_data)
+    user_data.hash_password()
+    await controller.create(user_data)
     return {"msg": "User created successfully"}
