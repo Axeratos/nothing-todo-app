@@ -11,8 +11,8 @@ router = APIRouter()
 @router.post("/sign-up")
 async def sign_up(user_data: UserCreate, db: DBSession):
     controller = BaseDatabaseController(User, db)
-    old_user = await controller.get_with_options(email=user_data.email, username=user_data.username)
-    if old_user:
+    old_users_queryset = await controller.get_options_queryset(email=user_data.email, username=user_data.username)
+    if old_users_queryset.first():
         raise HTTPException(status_code=400)
     user_data.hash_password()
     await controller.create(user_data)

@@ -21,11 +21,10 @@ class BaseDatabaseController(Generic[ModelType, CreateSchemaType, UpdateSchemaTy
         queryset = await self.session.scalars(select(self.model))
         return queryset.all()
 
-    async def get_with_options(self, **kwargs) -> Sequence[ModelType]:
-        queryset = await self.session.scalars(select(self.model).where(or_(
+    async def get_options_queryset(self, **kwargs):
+        return await self.session.scalars(select(self.model).where(or_(
             getattr(self.model, column) == value for column, value in kwargs.items()
         )))
-        return queryset.all()
 
     async def create(self, data: dict | CreateSchemaType) -> ModelType:
         if isinstance(data, BaseModel):
