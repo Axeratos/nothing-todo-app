@@ -9,4 +9,4 @@ class Note(Base):
     __tablename__ = "note"
     text: Mapped[str]
     owner_id: Mapped[int] = mapped_column(ForeignKey("user.id"))
-    owner: Mapped[User] = relationship(back_populates="tasks")
+    owner: Mapped[User] = relationship(backref="notes")

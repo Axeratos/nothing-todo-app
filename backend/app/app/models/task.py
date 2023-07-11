@@ -5,7 +5,7 @@ from sqlalchemy import String, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from .base_model import Base
-from app.models import User
+from .user import User
 
 
 class Task(Base):
@@ -14,4 +14,4 @@ class Task(Base):
     deadline_date: Mapped[date]
     deadline_time: Mapped[Optional[time]]
     owner_id: Mapped[int] = mapped_column(ForeignKey("user.id"))
-    owner: Mapped[User] = relationship(back_populates="tasks")
+    owner: Mapped[User] = relationship(backref="tasks")
