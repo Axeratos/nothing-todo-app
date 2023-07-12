@@ -7,7 +7,6 @@ from app.controllers import BaseDatabaseController
 from app.core.security import decode_token
 from app.db.database_core import engine
 from app.models import User
-from app.services.annotations import DBSession
 
 oauth2 = OAuth2PasswordBearer(tokenUrl="access-token")
 
@@ -22,7 +21,7 @@ async def get_session():
             raise e
 
 
-async def get_current_user(session: DBSession, token: str = Depends(oauth2)):
+async def get_current_user(session: Depends(get_session), token: str = Depends(oauth2)):
     token_data = decode_token(token)
     controller = BaseDatabaseController(User, session)
     user = controller.get(id=token_data.subject)

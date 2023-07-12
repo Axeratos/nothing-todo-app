@@ -1,7 +1,6 @@
 from pydantic import BaseModel, EmailStr
 
 from .base import BaseDBSchema
-from ..core.security import hash_password
 
 
 class UserBase(BaseModel):
@@ -14,9 +13,6 @@ class UserCreate(UserBase):
     email: EmailStr
     username: str
     password: str
-
-    def hash_password(self):
-        self.password = hash_password(self.password)
 
 
 class UserLogin(UserBase):
