@@ -8,6 +8,7 @@ print(env_path)
 
 class Settings(BaseSettings):
     DB_URL: str
+    JWT_SECRET_KEY: str
 
     class Config:
         env_file = env_path
