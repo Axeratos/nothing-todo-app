@@ -1,1 +1,3 @@
 from .base_controller import BaseDatabaseController
+from .user_controller import UserDatabaseController
+from .note_controller import NoteDatabaseController
