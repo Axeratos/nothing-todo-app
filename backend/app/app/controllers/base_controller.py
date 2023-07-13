@@ -5,7 +5,7 @@ from pydantic import BaseModel
 from sqlalchemy import select, or_, ScalarResult
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.controllers.types import ModelType, CreateSchemaType, UpdateSchemaType
+from app.types.controller import ModelType, CreateSchemaType, UpdateSchemaType
 
 
 class BaseDatabaseController(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
