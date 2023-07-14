@@ -1,6 +1,6 @@
 from fastapi import Depends, HTTPException
 from fastapi.security import OAuth2PasswordBearer
-from sqlalchemy.ext.asyncio import async_sessionmaker
+from sqlalchemy.ext.asyncio import async_sessionmaker, AsyncSession
 from starlette import status
 
 from app.controllers import UserDatabaseController
@@ -11,7 +11,7 @@ from app.models import User
 oauth2 = OAuth2PasswordBearer(tokenUrl="access-token")
 
 
-async def get_session():
+async def get_session() -> AsyncSession:
     session_maker = async_sessionmaker(engine, expire_on_commit=False, autoflush=False)
     async with session_maker() as session:
         try:
@@ -21,7 +21,7 @@ async def get_session():
             raise e
 
 
-async def get_current_user(session: Depends(get_session), token: str = Depends(oauth2)) -> User:
+async def get_current_user(session: AsyncSession = Depends(get_session), token: str = Depends(oauth2)):
     token_data = decode_token(token)
     controller = UserDatabaseController(User, session)
     user = await controller.get(id=token_data.subject)
@@ -30,7 +30,7 @@ async def get_current_user(session: Depends(get_session), token: str = Depends(o
     return user
 
 
-def get_current_verified_user(current_user: User = Depends(get_current_user)) -> User:
+def get_current_verified_user(current_user: User = Depends(get_current_user)):
     if not current_user.is_verified:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
