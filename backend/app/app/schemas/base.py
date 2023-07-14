@@ -4,7 +4,7 @@ from pydantic import BaseModel
 
 
 class BaseDBSchema(BaseModel):
-    pk: int
+    id: int
     created_at: datetime
     updated_at: datetime
 
