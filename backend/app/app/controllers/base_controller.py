@@ -1,8 +1,7 @@
 from typing import Type, Generic, Sequence
 
-from fastapi.encoders import jsonable_encoder
 from pydantic import BaseModel
-from sqlalchemy import select, or_, ScalarResult
+from sqlalchemy import select, or_, ScalarResult, update, delete
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.types.controller import ModelType, CreateSchemaType, UpdateSchemaType
@@ -17,8 +16,11 @@ class BaseDatabaseController(Generic[ModelType, CreateSchemaType, UpdateSchemaTy
         queryset = await self.session.scalars(select(self.model).filter_by(**kwargs))
         return queryset.first()
 
-    async def get_all(self) -> Sequence[ModelType]:
-        queryset = await self.session.scalars(select(self.model))
+    async def get_all(self, **kwargs) -> Sequence[ModelType]:
+        statement = select(self.model)
+        if kwargs:
+            statement = statement.filter_by(**kwargs)
+        queryset = await self.session.scalars(statement)
         return queryset.all()
 
     async def get_options_queryset(self, **kwargs) -> ScalarResult:
@@ -36,23 +38,17 @@ class BaseDatabaseController(Generic[ModelType, CreateSchemaType, UpdateSchemaTy
         await self.session.refresh(new_object)
         return new_object
 
-    async def update(self, new_object_data: dict | UpdateSchemaType, old_object: ModelType) -> ModelType:
-        old_obj_data = jsonable_encoder(old_object)
+    async def update(self, pk: int, new_object_data: dict | UpdateSchemaType, owner_id: int) -> ModelType:
         if isinstance(new_object_data, dict):
             update_data = new_object_data
         else:
             update_data = new_object_data.dict(exclude_unset=True)
-        for field in old_obj_data:
-            if field in update_data:
-                setattr(old_object, field, update_data[field])
-
+        query = await self.session.scalars(update(self.model).filter_by(id=pk, owner_id=owner_id).values(**update_data)
+                                           .returning(self.model))
         await self.session.commit()
-        return old_object
+        return query.first()
 
     async def delete(self, **kwargs) -> ModelType | None:
-        object_delete = await self.get(**kwargs)
-        if not object_delete:
-            return
-        await self.session.delete(object_delete)
+        query = await self.session.scalars(delete(self.model).filter_by(**kwargs).returning(self.model))
         await self.session.commit()
-        return object_delete
+        return query.first()
