@@ -16,7 +16,7 @@ async def create_note(note_data: NoteCreate, user: CurrentVerifiedUser, session:
 @router.get("/{pk}", response_model=NoteDB)
 async def get_note(pk: int, session: DBSession, user: CurrentVerifiedUser):
     note_controller = NoteDatabaseController(Note, session)
-    note = await note_controller.get(pk=pk, owner_id=user.id)
+    note = await note_controller.get(id=pk, owner_id=user.id)
     if not note:
         raise HTTPException(status_code=404, detail={"msg": "Note not found"})
     return note
@@ -40,7 +40,7 @@ async def update_note(pk: int, update_data: NoteUpdate, session: DBSession, user
 @router.delete("/{pk}")
 async def delete_note(pk: int, session: DBSession, user: CurrentVerifiedUser):
     note_controller = NoteDatabaseController(Note, session)
-    deleted_note = await note_controller.delete(pk=pk, owner_id=user.id)
+    deleted_note = await note_controller.delete(id=pk, owner_id=user.id)
     if not deleted_note:
         raise HTTPException(status_code=404, detail={"msg": "Note not found"})
     return deleted_note
