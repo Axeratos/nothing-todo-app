@@ -28,6 +28,12 @@ class BaseDatabaseController(Generic[ModelType, CreateSchemaType, UpdateSchemaTy
             getattr(self.model, column) == value for column, value in kwargs.items()
         )))
 
+    async def get_paginated(self, page: int, page_size: int, **kwargs):
+        queryset = await self.session.scalars(
+            select(self.model).filter_by(**kwargs).offset((page - 1) * page_size).limit(page_size)
+        )
+        return queryset.all()
+
     async def create(self, data: dict | CreateSchemaType) -> ModelType:
         if isinstance(data, BaseModel):
             data = data.dict()
