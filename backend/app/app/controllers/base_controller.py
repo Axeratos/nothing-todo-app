@@ -3,6 +3,7 @@ from typing import Type, Generic, Sequence
 from pydantic import BaseModel
 from sqlalchemy import select, or_, ScalarResult, update, delete
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.sql.functions import count
 
 from app.types.controller import ModelType, CreateSchemaType, UpdateSchemaType
 
@@ -27,6 +28,9 @@ class BaseDatabaseController(Generic[ModelType, CreateSchemaType, UpdateSchemaTy
         return await self.session.scalars(select(self.model).where(or_(
             getattr(self.model, column) == value for column, value in kwargs.items()
         )))
+
+    async def get_count(self, **kwargs) -> int:
+        return await self.session.scalar(select(count()).select_from(self.model).filter_by(**kwargs))
 
     async def get_paginated(self, page: int, page_size: int, **kwargs):
         queryset = await self.session.scalars(
