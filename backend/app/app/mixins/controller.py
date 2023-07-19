@@ -5,10 +5,11 @@ from app.types.controller import CreateSchemaType, ModelType
 
 
 class OwnerOperationsMixin:
-    async def create_with_owner(self: BaseDatabaseController, data: dict | CreateSchemaType, pk: int) -> ModelType:
+    async def create_with_owner(self: BaseDatabaseController, data: dict | CreateSchemaType,
+                                owner_id: int) -> ModelType:
         if isinstance(data, BaseModel):
             data = data.dict()
-        new_object = self.model(**data, owner_id=pk)
+        new_object = self.model(**data, owner_id=owner_id)
         self.session.add(new_object)
         await self.session.flush()
         await self.session.commit()
