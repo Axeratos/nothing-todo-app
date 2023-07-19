@@ -1,10 +1,9 @@
-from math import ceil
-
 from fastapi import APIRouter, HTTPException
 
 from app.controllers import NoteDatabaseController
 from app.schemas import NoteCreate, NoteUpdate, NoteDB
 from app.services.annotations import DBSession, CurrentVerifiedUser
+from app.structs import Page
 
 router = APIRouter()
 
@@ -33,16 +32,8 @@ async def get_all_notes(session: DBSession, user: CurrentVerifiedUser):
 @router.get("/")
 async def get_notes_paginated(session: DBSession, user: CurrentVerifiedUser, page: int = 1, page_size: int = 5):
     note_controller = NoteDatabaseController(session)
-    response_data = {"items": None, "has_next": None}
-    # page = Page.create_new_page(note_controller, page, page_size, owner_id=user.id)
-    items_count = await note_controller.get_count(owner_id=user.id)
-    pages_count = ceil(items_count / page_size)
-    if page > pages_count:
-        raise HTTPException(status_code=404, detail={"msg": "Page does not exists"})
-    response_data["items"] = await note_controller.get_paginated(page, page_size, owner_id=user.id)
-    response_data["pages_count"] = pages_count
-    response_data["has_next"] = page < pages_count
-    return response_data
+    page = await Page.create_new_page(note_controller, page, page_size, owner_id=user.id)
+    return page
 
 
 @router.put("/{pk}")
