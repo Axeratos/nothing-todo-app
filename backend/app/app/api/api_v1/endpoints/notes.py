@@ -29,14 +29,14 @@ async def get_note(pk: int, session: DBSession, user: CurrentVerifiedUser):
     return note
 
 
-@router.get("/")
+@router.get("/", response_model=Page)
 async def get_notes_paginated(session: DBSession, user: CurrentVerifiedUser, page: int = 1, page_size: int = 5):
     note_controller = NoteDatabaseController(session)
     page = await Page.create_new_page(note_controller, page, page_size, owner_id=user.id)
     return page
 
 
-@router.put("/{pk}")
+@router.put("/{pk}", response_model=NoteDB)
 async def update_note(pk: int, update_data: NoteUpdate, session: DBSession, user: CurrentVerifiedUser):
     note_controller = NoteDatabaseController(session)
     updated_note = await note_controller.update(pk, update_data, user.id)
@@ -45,7 +45,7 @@ async def update_note(pk: int, update_data: NoteUpdate, session: DBSession, user
     return updated_note
 
 
-@router.delete("/{pk}")
+@router.delete("/{pk}", response_model=NoteDB)
 async def delete_note(pk: int, session: DBSession, user: CurrentVerifiedUser):
     note_controller = NoteDatabaseController(session)
     deleted_note = await note_controller.delete(id=pk, owner_id=user.id)

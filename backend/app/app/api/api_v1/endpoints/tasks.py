@@ -14,13 +14,13 @@ async def get_all_tasks(session: DBSession, user: CurrentVerifiedUser):
     return await task_controller.get_all(owner_id=user.id)
 
 
-@router.post("/")
+@router.post("/", response_model=TaskDB)
 async def create_task(task_data: TaskCreate, user: CurrentVerifiedUser, session: DBSession):
     task_controller = TaskDatabaseController(session)
     return await task_controller.create_with_owner(task_data, user.id)
 
 
-@router.get("/{pk}")
+@router.get("/{pk}", response_model=TaskDB)
 async def get_task(pk: int, session: DBSession, user: CurrentVerifiedUser):
     task_controller = TaskDatabaseController(session)
     task = await task_controller.get(id=pk, owner_id=user.id)
@@ -29,14 +29,14 @@ async def get_task(pk: int, session: DBSession, user: CurrentVerifiedUser):
     return task
 
 
-@router.get("/")
+@router.get("/", response_model=list[TaskDB])
 async def get_tasks_paginated(session: DBSession, user: CurrentVerifiedUser, page: int = 1, page_size: int = 5):
     task_controller = TaskDatabaseController(session)
     page = await Page.create_new_page(task_controller, page, page_size, owner_id=user.id)
     return page
 
 
-@router.put("/{pk}")
+@router.put("/{pk}", response_model=TaskDB)
 async def update_task(pk: int, update_data: TaskUpdate, session: DBSession, user: CurrentVerifiedUser):
     task_controller = TaskDatabaseController(session)
     updated_task = await task_controller.update(pk, update_data, user.id)
@@ -45,7 +45,7 @@ async def update_task(pk: int, update_data: TaskUpdate, session: DBSession, user
     return updated_task
 
 
-@router.delete("/{pk}")
+@router.delete("/{pk}", response_model=TaskDB)
 async def delete_task(pk: int, session: DBSession, user: CurrentVerifiedUser):
     task_controller = TaskDatabaseController(session)
     deleted_task = await task_controller.delete(id=pk, owner_id=user.id)
