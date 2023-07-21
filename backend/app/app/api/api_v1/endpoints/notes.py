@@ -8,6 +8,12 @@ from app.structs import Page
 router = APIRouter()
 
 
+@router.get("/all", response_model=list[NoteDB])
+async def get_all_notes(session: DBSession, user: CurrentVerifiedUser):
+    note_controller = NoteDatabaseController(session)
+    return await note_controller.get_all(owner_id=user.id)
+
+
 @router.post("/", response_model=NoteDB)
 async def create_note(note_data: NoteCreate, user: CurrentVerifiedUser, session: DBSession):
     note_controller = NoteDatabaseController(session)
@@ -21,12 +27,6 @@ async def get_note(pk: int, session: DBSession, user: CurrentVerifiedUser):
     if not note:
         raise HTTPException(status_code=404, detail={"msg": "Note not found"})
     return note
-
-
-@router.get("/all", response_model=list[NoteDB])
-async def get_all_notes(session: DBSession, user: CurrentVerifiedUser):
-    note_controller = NoteDatabaseController(session)
-    return await note_controller.get_all(owner_id=user.id)
 
 
 @router.get("/")
